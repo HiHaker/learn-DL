@@ -1,0 +1,5 @@
+batch_size: 24
+loss_function: cross_entropy
+optimizer: Adam
+epoch_number: 50
+train loss:  0 %[->.................................................]1.099
