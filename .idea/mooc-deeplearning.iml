@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/肺炎识别实战" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/实战/AlexNet实战" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Remote Python 3.6.15 (sftp://hujianlong@10.24.82.231:22/home/hujianlong/program/miniconda3/envs/torch/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
