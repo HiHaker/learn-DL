@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # 加载模型
 G = Generator()
-model_weight_path = './model/G100.pth'
+model_weight_path = './model/G8.pth'
 G.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
 # 固定模型
 G.eval()

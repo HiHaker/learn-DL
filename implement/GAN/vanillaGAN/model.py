@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 
@@ -12,6 +11,7 @@ class Generator(nn.Module):
         self.bn1 = nn.BatchNorm1d(128)
         self.bn2 = nn.BatchNorm1d(256)
         self.bn3 = nn.BatchNorm1d(784)
+        self._initialize_weights()
 
     def forward(self, n):
         x = self.layer1(n)
@@ -24,6 +24,12 @@ class Generator(nn.Module):
         output = self.bn3(x)
         return output
 
+    # 初始化参数的函数
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+
 
 class Discriminator(nn.Module):
     def __init__(self):
@@ -34,6 +40,7 @@ class Discriminator(nn.Module):
         self.activation = nn.ReLU()
         self.bn1 = nn.BatchNorm1d(256)
         self.bn2 = nn.BatchNorm1d(128)
+        self._initialize_weights()
 
     def forward(self, i):
         x = self.layer1(i)
@@ -45,3 +52,9 @@ class Discriminator(nn.Module):
         x = self.layer3(x)
         output = nn.Sigmoid()(x)
         return output
+
+    # 初始化参数的函数
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
