@@ -1,10 +1,11 @@
+import torch
 import torch.nn as nn
 
 
 class Generator(nn.Module):
-    def __init__(self):
+    def __init__(self, z_dim):
         super(Generator, self).__init__()
-        self.layer1 = nn.Linear(100, 128)
+        self.layer1 = nn.Linear(z_dim, 128)
         self.layer2 = nn.Linear(128, 256)
         self.layer3 = nn.Linear(256, 784)
         self.activation = nn.ReLU()
@@ -13,8 +14,8 @@ class Generator(nn.Module):
         self.bn3 = nn.BatchNorm1d(784)
         self._initialize_weights()
 
-    def forward(self, n):
-        x = self.layer1(n)
+    def forward(self, x):
+        x = self.layer1(x)
         x = self.bn1(x)
         x = self.activation(x)
         x = self.layer2(x)
@@ -22,7 +23,7 @@ class Generator(nn.Module):
         x = self.activation(x)
         x = self.layer3(x)
         output = self.bn3(x)
-        return output
+        return output.view(-1, 28, 28)
 
     # 初始化参数的函数
     def _initialize_weights(self):
@@ -42,16 +43,17 @@ class Discriminator(nn.Module):
         self.bn2 = nn.BatchNorm1d(128)
         self._initialize_weights()
 
-    def forward(self, i):
-        x = self.layer1(i)
+    def forward(self, x):
+        x = torch.flatten(x, start_dim=1)
+        x = self.layer1(x)
         x = self.bn1(x)
         x = self.activation(x)
         x = self.layer2(x)
         x = self.bn2(x)
         x = self.activation(x)
         x = self.layer3(x)
-        output = nn.Sigmoid()(x)
-        return output
+        x = nn.Sigmoid()(x)
+        return torch.flatten(x)
 
     # 初始化参数的函数
     def _initialize_weights(self):
