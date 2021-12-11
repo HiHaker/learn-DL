@@ -43,7 +43,9 @@ learning_rate = 1e-4
 # optimizerG = optim.SGD(G.parameters(), lr=learning_rate)
 # optimizerD = optim.SGD(D.parameters(), lr=learning_rate)
 optimizerG = optim.Adam(G.parameters(), lr=learning_rate)
-optimizerD = optim.Adam(D.parameters(), lr=learning_rate*0.08)
+optimizerD = optim.Adam(D.parameters(), lr=learning_rate)
+interval = [1,10]
+scheduler = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=interval, gamma=0.1)
 
 # 模型保存路径
 model_savpath = './model/'
@@ -51,7 +53,7 @@ model_savpath = './model/'
 data_savepath = './data/'
 
 # 训练轮次
-epoch = 100
+epoch = 200
 total_lossD = []
 total_lossG = []
 for i in range(epoch):
@@ -104,6 +106,8 @@ for i in range(epoch):
 
         avg_lossD += lossD.item()
         avg_lossG += lossG.item()
+
+    scheduler.step()
 
     avg_lossD /= step
     avg_lossG /= step
