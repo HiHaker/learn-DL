@@ -38,6 +38,5 @@
 # print(output)
 # output.backward()
 
-from model import Generator
-
-G = Generator()
+import torch
+print(torch.__version__)

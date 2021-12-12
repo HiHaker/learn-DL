@@ -5,9 +5,11 @@ import pickle
 from torchvision import datasets
 import torchvision.transforms as transforms
 from torch.utils.data.dataset import Dataset
-from model import Generator, Discriminator
-from utils import D_loss, G_loss
+from .DCGAN.model import Generator, Discriminator
+from .utils import D_loss, G_loss
 
+# 当前训练的模型名称
+current_model_name = './DCGAN/'
 # 批大小
 batch_size = 32
 # 线程数
@@ -38,22 +40,22 @@ D.to(device)
 # 指定loss函数
 criterion = nn.BCELoss()
 # 学习率
-learning_rate = 1e-4
+learning_rate = 1e-5
 # 优化器
 # optimizerG = optim.SGD(G.parameters(), lr=learning_rate)
 # optimizerD = optim.SGD(D.parameters(), lr=learning_rate)
 optimizerG = optim.Adam(G.parameters(), lr=learning_rate)
-optimizerD = optim.Adam(D.parameters(), lr=learning_rate)
-interval = [1,10]
-scheduler = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=interval, gamma=0.1)
+optimizerD = optim.Adam(D.parameters(), lr=learning_rate*0.5)
+# interval = [1,10]
+# scheduler = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=interval, gamma=0.1)
 
 # 模型保存路径
-model_savpath = './model/'
+model_savpath = current_model_name + 'model/'
 # 数据保存路径
-data_savepath = './data/'
+data_savepath = current_model_name + 'data/'
 
 # 训练轮次
-epoch = 200
+epoch = 100
 total_lossD = []
 total_lossG = []
 for i in range(epoch):
@@ -88,6 +90,7 @@ for i in range(epoch):
         real_op = D(real_imgs)
         fake_op = D(fake_imgs)
         lossD = D_loss(real_op, real_label, fake_op, fake_label)
+
         lossD.backward()
         optimizerD.step()
 
@@ -107,7 +110,7 @@ for i in range(epoch):
         avg_lossD += lossD.item()
         avg_lossG += lossG.item()
 
-    scheduler.step()
+    # scheduler.step()
 
     avg_lossD /= step
     avg_lossG /= step
