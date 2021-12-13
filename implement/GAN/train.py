@@ -5,15 +5,15 @@ import pickle
 from torchvision import datasets
 import torchvision.transforms as transforms
 from torch.utils.data.dataset import Dataset
-from .DCGAN.model import Generator, Discriminator
-from .utils import D_loss, G_loss
+from DCGAN.model import Generator, Discriminator
+from utils import D_loss, G_loss
 
 # 当前训练的模型名称
 current_model_name = './DCGAN/'
 # 批大小
-batch_size = 32
+batch_size = 64
 # 线程数
-num_workers = 4
+num_workers = 0
 # GPU
 torch.cuda.set_device(3)
 device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
@@ -40,12 +40,12 @@ D.to(device)
 # 指定loss函数
 criterion = nn.BCELoss()
 # 学习率
-learning_rate = 1e-5
+learning_rate = 0.0002
 # 优化器
-# optimizerG = optim.SGD(G.parameters(), lr=learning_rate)
+# optimizerG = optim.SGD(G.parameters(), lr=learning_rate
 # optimizerD = optim.SGD(D.parameters(), lr=learning_rate)
 optimizerG = optim.Adam(G.parameters(), lr=learning_rate)
-optimizerD = optim.Adam(D.parameters(), lr=learning_rate*0.5)
+optimizerD = optim.Adam(D.parameters(), lr=learning_rate)
 # interval = [1,10]
 # scheduler = optim.lr_scheduler.MultiStepLR(optimizerD, milestones=interval, gamma=0.1)
 
@@ -81,14 +81,14 @@ for i in range(epoch):
         real_imgs, _ = data
         real_imgs = real_imgs.to(device)
 
-        # Generator 产生的数据的标签为0
-        fake_label = torch.zeros([batch_size])
-        fake_label = fake_label.to(device)
-        real_label = torch.ones([batch_size])
+        real_op = D(real_imgs)
+        real_label = torch.ones_like(real_op)
         real_label = real_label.to(device)
 
-        real_op = D(real_imgs)
         fake_op = D(fake_imgs)
+        fake_label = torch.zeros_like(fake_op)
+        fake_label = fake_label.to(device)
+
         lossD = D_loss(real_op, real_label, fake_op, fake_label)
 
         lossD.backward()
@@ -103,6 +103,7 @@ for i in range(epoch):
         noise = noise.to(device)
         fake_imgs = G(noise)
         fake_op = D(fake_imgs)
+        real_label = torch.ones_like(fake_op)
         lossG = G_loss(fake_op, real_label)
         lossG.backward()
         optimizerG.step()

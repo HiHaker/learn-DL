@@ -7,7 +7,7 @@ z_dim = 100
 G = Generator(z_dim)
 current_model_name = './DCGAN/'
 # 选择测试的模型
-select_trained_model = 'G1.pth'
+select_trained_model = 'G10.pth'
 model_weight_path = current_model_name + 'model/' + select_trained_model
 G.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
 

@@ -1,5 +1,3 @@
-import os
+import torch
 
-from .DCGAN.model import Generator
-
-print(os.getcwd())
+print(torch.cuda.is_available())
