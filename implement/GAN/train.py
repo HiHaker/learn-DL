@@ -5,15 +5,17 @@ import pickle
 from torchvision import datasets
 import torchvision.transforms as transforms
 from torch.utils.data.dataset import Dataset
+# from vanillaGAN.model import Generator, Discriminator
 from DCGAN.model import Generator, Discriminator
 from utils import D_loss, G_loss
 
 # 当前训练的模型名称
+# current_model_name = './vanillaGAN/'
 current_model_name = './DCGAN/'
 # 批大小
 batch_size = 64
 # 线程数
-num_workers = 0
+num_workers = 4
 # GPU
 torch.cuda.set_device(3)
 device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
@@ -55,7 +57,7 @@ model_savpath = current_model_name + 'model/'
 data_savepath = current_model_name + 'data/'
 
 # 训练轮次
-epoch = 100
+epoch = 50
 total_lossD = []
 total_lossG = []
 for i in range(epoch):
@@ -67,10 +69,7 @@ for i in range(epoch):
         optimizerG.zero_grad()
         optimizerD.zero_grad()
 
-        # 固定G train D
-        G.eval()
-        D.train()
-
+        # 训练D
         # 产生高斯噪声数据
         noise = torch.normal(0, 1, (batch_size, z_dim))
         noise = noise.to(device)
@@ -79,32 +78,25 @@ for i in range(epoch):
         fake_imgs = G(noise)
         # 取出数据
         real_imgs, _ = data
-        real_imgs = real_imgs.to(device)
 
-        real_op = D(real_imgs)
+        real_op = D(real_imgs.to(device))
         real_label = torch.ones_like(real_op)
-        real_label = real_label.to(device)
 
-        fake_op = D(fake_imgs)
+        # 注意这里fake_img的detach，因为这里我们只更新D，不更新给，所以这里fake_img不参与梯度计算
+        fake_op = D(fake_imgs.detach())
         fake_label = torch.zeros_like(fake_op)
-        fake_label = fake_label.to(device)
 
-        lossD = D_loss(real_op, real_label, fake_op, fake_label)
+        lossD = D_loss(real_op, real_label.to(device), fake_op, fake_label.to(device))
 
         lossD.backward()
         optimizerD.step()
 
-        # 固定住D，训练G
-        D.eval()
-        G.train()
-
-        # 产生高斯噪声数据
-        noise = torch.normal(0, 1, (batch_size, z_dim))
-        noise = noise.to(device)
-        fake_imgs = G(noise)
+        # 训练G
         fake_op = D(fake_imgs)
         real_label = torch.ones_like(fake_op)
+
         lossG = G_loss(fake_op, real_label)
+
         lossG.backward()
         optimizerG.step()
 

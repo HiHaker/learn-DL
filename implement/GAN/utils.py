@@ -24,9 +24,9 @@ def show_results(imgs, col, row, data_path, save_path, desc):
     for i in range(row):
         for j in range(col):
             axes[i][j].imshow(imgs[i * col + j], cmap='gray')
-    plt.show()
     # 保存图像
-    fig.savefig(save_path + desc + 'result.png')
+    plt.savefig(save_path + desc + 'result.png')
+    plt.show()
 
     # 绘制loss曲线
     with open(data_path+'lossD.txt', 'rb') as f:
@@ -36,6 +36,6 @@ def show_results(imgs, col, row, data_path, save_path, desc):
     epoch = [i for i in range(len(lossD))]
     plt.plot(epoch, lossD, color='red', label='lossD')
     plt.plot(epoch, lossG, color='yellow', label='lossG')
-    plt.show()
     # 保存图像
-    fig.savefig(save_path + desc + 'loss.png')
+    plt.savefig(save_path + desc + 'loss.png')
+    plt.show()
